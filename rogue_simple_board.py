@@ -186,7 +186,7 @@ def user_move(x_pos, y_pos, key_press, board):
     return x_pos, y_pos
 
 
-def collect_item(points, board, x_pos, y_pos):
+def collect_item(points, board, x_pos, y_pos, inventory):
     '''COLLECT LUGGAGE FROM LEVEL'''
     player_position = board[y_pos][x_pos]
     items = {
@@ -197,8 +197,22 @@ def collect_item(points, board, x_pos, y_pos):
 
     if player_position in items:
         points += items[player_position]
+    if player_position == BLUE + '[' + RESET or player_position == BLUE + ']' + RESET:
+        inventory['books'] += 1
+    if player_position == YELLOW + 'I' + RESET:
+        inventory['wand'] += 1
+    if player_position == RED + '&' + RESET:
+        inventory['bean'] += 1
+    if player_position == GREEN + 'w' + RESET:
+        inventory['owl'] += 1
+    if player_position == YELLOW + '>' + RESET:
+        inventory['broomstick'] += 1
+    if player_position == YELLOW + 'O' + RESET:
+        inventory['golden snitch'] += 1
+    if player_position == GREEN + '%' + RESET:
+        inventory['elixir'] += 1
 
-    return points
+    return points, inventory
 
 
 def ask_puzzles(points, board, x_pos, y_pos):
@@ -276,6 +290,7 @@ def main():
     key_press = ' '
     points = 0
     points = 0
+    inventory = {'books': 0, 'wand': 0, 'bean':  0, 'elixir': 0, 'broomstick': 0, 'owl': 0, 'golden snitch': 0}
 
     start_screen('start_screen')
     sleep(2)
@@ -307,7 +322,8 @@ def main():
         old_y = y_pos
         x_pos, y_pos = user_move(x_pos, y_pos, key_press, board)
         os.system("clear")
-        points = collect_item(points, board, x_pos, y_pos)
+        points, inventory = collect_item(points, board, x_pos, y_pos, inventory)
+        print(inventory)
         points = ask_puzzles(points, board, x_pos, y_pos)
         touch_spider(board, x_pos, y_pos)
         board = insert_player(board, x_pos, y_pos, old_x, old_y)
