@@ -1,6 +1,14 @@
 import random
 from time import sleep
 import os
+import create_board
+import scorelist
+import win_screen
+import lose_screen
+import story_forest
+import story_elixir
+import story_quidditch
+import story_alley
 
 RED = '\033[31m'
 ORANGE = '\033[33m'
@@ -11,42 +19,13 @@ GREEN = '\033[32m'
 
 
 def start_screen(file='start_screen'):
-    '''Open file and read it'''
+    '''Open two first file and read it as screen'''
     with open(file, 'r') as screen:
         screen = screen.readlines()
 
     for row in screen:
         for char in row:
             print(char, end='')
-
-
-def show_character_screen():
-    with open('character_screen', 'r') as screen:
-        screen = screen.readlines()
-
-    RED_CHARS = ['&', '|']
-    BLUE_CHARS = ['[', ']', 'x']
-    YELLOW_CHARS = [
-        '>', '<', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
-        'R', 'S', 'T', 'U', 'W', 'Y', 'Z']
-    GREEN_CHARS = ['o', '\', ''', '!', '_', '%', 'w']
-
-    for row in screen:
-        for char in row:
-            if char in RED_CHARS:
-                print(RED + char + RESET, end='')
-            elif char in YELLOW_CHARS:
-                print(YELLOW + char + RESET, end='')
-            elif char in BLUE_CHARS:
-                print(BLUE + char + RESET, end='')
-            elif char in GREEN_CHARS:
-                print(GREEN + char + RESET, end='')
-            else:
-                print(char, end='')
-    sleep(2)
-    menu = 1
-    os.system('clear')
-    return menu
 
 
 def help_screen():
@@ -86,19 +65,21 @@ def author_screen():
 
 
 def menu_choose(menu):
-    '''Choice options of menu'''
+    '''Choice options of menu from 1 to 4'''
     try:
-        menu = int(input('Chose 1, 2, 3 '))
+        menu = int(input('Chose 1, 2, 3, 4 '))
         if menu == 1:
-            show_character_screen()
+            import show_character_screen
+            show_character_screen.show_character_screen()
         elif menu == 2:
             help_screen()
         elif menu == 3:
             print(author_screen())
+            sleep(3)
         elif menu == 4:
             print("Return")
     except:
-        print("bad")
+        print("Bad choice")
     return menu
 
 
@@ -115,41 +96,6 @@ def start():
         if choice_diagon == 4:
             os.system("clear")
             break
-
-
-def create_board(file='diagon_alley'):
-    '''OPEN AND READ MAP'''
-    with open(file, 'r') as level:
-        level = level.readlines()
-
-    RED_CHARS = ['&', '|']
-    BLUE_CHARS = ['[', ']', 'x']
-    YELLOW_CHARS = [
-        '>', '<', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
-        'R', 'S', 'T', 'U', 'W', 'Y', 'Z']
-    GREEN_CHARS = ['o', '\', ''', '!', '_', '%', 'w']
-
-    board = []
-    for row in level:
-        board_row = []
-        for char in row:
-            if char in RED_CHARS:
-                red = (RED + char + RESET)
-                board_row.append(red)
-            elif char in YELLOW_CHARS:
-                yellow = (YELLOW + char + RESET)
-                board_row.append(yellow)
-            elif char in BLUE_CHARS:
-                blue = (BLUE + char + RESET)
-                board_row.append(blue)
-            elif char in GREEN_CHARS:
-                green = (GREEN + char + RESET)
-                board_row.append(green)
-            else:
-                board_row.append(char)
-
-        board.append(board_row)
-    return board
 
 
 def print_board(board, points):
@@ -265,7 +211,7 @@ def print_inventory(board, inventory):
 
 
 def ask_puzzles(points, board, x_pos, y_pos):
-    '''ASK PUZZLES AFTER TOUCH ! SIGN'''
+    '''ASK PUZZLES AFTER TOUCH % SIGN'''
     puzzle_position = board[y_pos][x_pos]
     collection_of_questions = {
         'What kind of spell do you use to open the locks?: HINT:a': "alohomora",
@@ -290,7 +236,7 @@ def ask_puzzles(points, board, x_pos, y_pos):
         if user_response == collection_of_questions[random_question]:
             points += 3
         else:
-            points -= 2
+            points -= 5
     return points
 
 
@@ -315,7 +261,7 @@ def random_number():
     return secret_number
 
 
-def find_number(secret_number, points):
+def find_number(secret_number, points, winner):
     '''Final game hot-warm-cold. User find secret number, 10 chance'''
     guess = 0
     while guess < 10:
@@ -347,15 +293,13 @@ def find_number(secret_number, points):
 
 def game_over():
     '''display lose screen and show all scorelist'''
-    import lose_screen
-    import scorelist
+    lose_screen.display_lose_screen()
     scorelist.display_scorelist()
 
 
 def winner(points):
     '''display win screen, add data to ranking and show all scorelist'''
-    import win_screen
-    import scorelist
+    win_screen.display_win_screen
     ranking = scorelist.get_score_list(points)
     scorelist.add_result_to_scorelist(ranking)
     scorelist.display_scorelist()
@@ -383,10 +327,10 @@ def main():
         points = 0
         inventory = {'books': 0, 'wand': 0, 'bean':  0, 'elixir': 0, 'broomstick': 0, 'owl': 0, 'golden snitch': 0}
 
-        import story_alley
+        story_alley.display_story_alley()
         sleep(5)
 
-        board = create_board()
+        board = create_board.create_board()
         x_pos = 15
         y_pos = 5
         enemy_x = 12
@@ -418,22 +362,23 @@ def main():
             print_board(board, points)
             print_inventory(board, inventory)
 
-            if points >= 1 and level == 1:
+            if points >= 20 and level == 1:
                 os.system("clear")
-                import story_quidditch
+                story_quidditch.display_story_quidditch()
                 sleep(5)
                 level += 1
                 x_pos = 2
                 y_pos = 2
                 enemy_y = 21
                 enemy_x = 24
-                board = create_board('quidditch_game')
+
+                board = create_board.create_board('quidditch_game')
                 board = insert_player(board, x_pos, y_pos, old_x, old_y)
                 board, enemy_y, enemy_x, x_from, x_to, y_from, y_to = insert_enemy(board, enemy_y, enemy_x, 24, 27, 20, 22)
 
-            if points > 25 and level == 2:
+            if points > 31 and level == 2:
                 os.system("clear")
-                import story_elixir
+                story_elixir.display_story_elixir()
                 sleep(5)
                 level += 1
                 x_pos = 2
@@ -441,11 +386,15 @@ def main():
                 enemy_y = 15
                 enemy_x = 16
                 board = insert_player(board, x_pos, y_pos, old_x, old_y)
-                board = create_board('elixir_lesson')
+                board = create_board.create_board('elixir_lesson')
                 board, enemy_y, enemy_x, x_from, x_to, y_from, y_to = insert_enemy(board, enemy_y, enemy_x, 15, 17, 14, 18)
 
-            if points > 30 and level == 3:
-                import story_forest
+            if inventory['elixir'] == 24:
+                game_over()
+                want_play = play_again(want_play)
+
+            if points > 55 and level == 3:
+                story_forest.display_story_forest()
                 sleep(5)
                 level += 1
                 x_pos = 2
@@ -453,7 +402,7 @@ def main():
                 enemy_y = 21
                 enemy_x = 18
                 board = insert_player(board, x_pos, y_pos, old_x, old_y)
-                board = create_board('forest')
+                board = create_board.create_board('forest')
                 board, enemy_y, enemy_x, x_from, x_to, y_from, y_to = insert_enemy(board, enemy_y, enemy_x, 17, 18, 21, 22)
 
             if points < 0:
