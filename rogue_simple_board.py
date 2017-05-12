@@ -261,7 +261,7 @@ def random_number():
     return secret_number
 
 
-def find_number(secret_number, points, winner):
+def find_number(secret_number, points):
     '''Final game hot-warm-cold. User find secret number, 10 chance'''
     guess = 0
     while guess < 10:
